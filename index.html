@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priya & Aarav's Royal Wedding Invitation</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cormorant Garamond & Great Vibes for luxury wedding typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ivory: '#FAF7F2',
+                        'ivory-dark': '#F2ECE1',
+                        maroon: {
+                            600: '#7A1C2E',
+                            700: '#5C121F',
+                            800: '#420D15',
+                            900: '#2A070D'
+                        },
+                        gold: {
+                            400: '#E6C567',
+                            500: '#D4AF37',
+                            600: '#B89728',
+                            700: '#997A1E'
+                        },
+                        blush: {
+                            100: '#FDF2F4',
+                            200: '#F7D7DE'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        script: ['"Great Vibes"', 'cursive'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom animations & delicate traditional styling */
+        @keyframes floatPetal {
+            0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
+        }
+        .petal {
+            position: fixed;
+            top: -10vh;
+            background: radial-gradient(circle, #F7D7DE 0%, #D4AF37 100%);
+            border-radius: 150% 0 150% 0;
+            pointer-events: none;
+            z-index: 40;
+            animation: floatPetal linear infinite;
+            opacity: 0.7;
+        }
+        .gold-border {
+            border: 2px solid #D4AF37;
+            position: relative;
+        }
+        .gold-border::after {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            pointer-events: none;
+        }
+        .ornate-card {
+            background: linear-gradient(135deg, #FAF7F2 0%, #FFFDF9 100%);
+            box-shadow: 0 15px 35px -5px rgba(90, 18, 31, 0.08), 0 5px 15px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Invitation Envelope / Card Opening Animation Styles */
+        .card-container {
+            perspective: 2000px;
+        }
+        .envelope-cover {
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease;
+            transform-origin: left;
+        }
+        .envelope-cover.opened {
+            transform: rotateY(-130deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Kindle Notebook Page Transitions */
+        .notebook-page {
+            display: none;
+            animation: fadeInPage 0.6s ease forwards;
+        }
+        .notebook-page.active {
+            display: block;
+        }
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .petal, * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-maroon-900 text-maroon-900 font-sans antialiased overflow-x-hidden selection:bg-gold-500 selection:text-white">
+
+    <!-- Floating Petals Container -->
+    <div id="petals-container" aria-hidden="true"></div>
+
+    <!-- Music Control Floating Button -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="music-toggle" onclick="toggleMusic()" class="flex items-center gap-2 bg-maroon-700 text-gold-400 px-4 py-3 rounded-full shadow-2xl border border-gold-500 hover:bg-maroon-800 transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold-400" aria-label="Toggle background music">
+            <svg id="music-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+            </svg>
+            <span id="music-text" class="text-xs font-semibold tracking-wider uppercase">Play Sangeet</span>
+        </button>
+        <!-- Hidden Audio Element -->
+        <audio id="bg-audio" loop preload="none">
+            <source src="https://actions.google.com/sounds/v1/ambiences/indian_market.ogg" type="audio/ogg">
+        </audio>
+    </div>
+
+    <!-- STAGE 1: REAL INTERACTIVE WEDDING INVITATION ENVELOPE COVER -->
+    <div id="invite-cover-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-maroon-900 bg-cover bg-center transition-opacity duration-1000">
+        <div class="absolute inset-0 bg-maroon-900/90 backdrop-blur-md"></div>
+
+        <div class="relative z-10 max-w-lg w-full bg-maroon-800 gold-border p-8 md:p-12 rounded-3xl text-center shadow-2xl text-ivory card-container">
+            <!-- Decorative Ganesha Motif -->
+            <div class="mb-4 text-gold-400 text-2xl tracking-widest font-serif">
+                ॥ श्री गणेशाय नमः ॥
+            </div>
+            <div class="w-16 h-0.5 bg-gold-500 mx-auto mb-6"></div>
+
+            <p class="text-gold-400 font-serif italic text-lg tracking-wide mb-4">
+                You Are Cordially Invited
+            </p>
+
+            <h1 class="font-script text-5xl md:text-6xl text-gold-400 mb-6 drop-shadow-md">
+                Priya &amp; Aarav
+            </h1>
+
+            <p class="text-ivory/80 font-serif text-sm md:text-base mb-8 leading-relaxed">
+                Tap the seal below to open your royal wedding invitation card, trigger celebrations, and step inside.
+            </p>
+
+            <button onclick="openWeddingCard()" class="group relative inline-flex items-center gap-3 bg-gradient-to-r from-gold-500 to-gold-600 text-maroon-900 font-bold px-10 py-4 rounded-full shadow-2xl hover:from-gold-400 hover:to-gold-500 transition transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gold-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l9 6 9-6" />
+                </svg>
+                <span class="text-base tracking-wider uppercase font-serif">Open Invitation Card</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- STAGE 2: KINDLE NOTEBOOK / CHAPTER READER WEBSITE CONTENT (Hidden initially until opened) -->
+    <div id="main-content" class="opacity-0 pointer-events-none transition-opacity duration-1000 bg-ivory text-maroon-900 min-h-screen pb-20">
+        
+        <!-- Top Navigation / Kindle Reader Status Bar -->
+        <nav class="sticky top-0 z-40 bg-maroon-900/95 text-ivory backdrop-blur-md border-b border-gold-500/30 px-6 py-4 shadow-md flex flex-wrap items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="font-script text-3xl text-gold-400">P &amp; A</span>
+                <span class="hidden sm:inline text-xs font-serif tracking-widest text-gold-400/80 uppercase">| Royal Celebration Reader</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span id="page-indicator" class="text-xs font-serif text-gold-400 px-3 py-1 bg-maroon-800 rounded-full border border-gold-500/40">Chapter 1 of 5</span>
+            </div>
+        </nav>
+
+        <!-- NOTEBOOK CONTAINER (Kindle Pages) -->
+        <main class="max-w-4xl mx-auto px-4 py-12">
+            
+            <!-- PAGE 1: HERO & INVITATION WELCOME -->
+            <section id="page-1" class="notebook-page active ornate-card p-8 md:p-16 rounded-3xl gold-border text-center my-6">
+                <div class="mb-4 text-gold-600 text-xl font-serif">॥ श्री गणेशाय नमः ॥</div>
+                <div class="w-12 h-0.5 bg-gold-500 mx-auto mb-6"></div>
+                <p class="text-gold-600 font-serif italic text-lg mb-4">Together with their families</p>
+                <div class="space-y-2 mb-8">
+                    <h1 class="font-script text-6xl md:text-8xl text-maroon-800 drop-shadow-sm">Priya</h1>
+                    <div class="font-serif italic text-3xl text-gold-600 py-1">&amp;</div>
+                    <h1 class="font-script text-6xl md:text-8xl text-maroon-800 drop-shadow-sm">Aarav</h1>
+                </div>
+                <p class="text-maroon-900/80 font-serif text-lg max-w-xl mx-auto mb-8 leading-relaxed">
+                    Invite you with immense joy to celebrate their sacred wedding union in the royal heritage city of Jaipur.
+                </p>
+                <div class="inline-block border-y border-gold-500/50 py-3 px-8 mb-8">
+                    <p class="font-serif text-maroon-800 text-2xl tracking-widest font-semibold">15 FEBRUARY 2027</p>
+                    <p class="text-xs uppercase tracking-widest text-maroon-700/70 mt-1">Jaipur, Rajasthan</p>
+                </div>
+            </section>
+
+            <!-- PAGE 2: COUPLE PORTRAIT -->
+            <section id="page-2" class="notebook-page ornate-card p-8 md:p-16 rounded-3xl gold-border text-center my-6">
+                <span class="text-gold-600 font-serif text-sm tracking-widest uppercase">The Blessed Union</span>
+                <div class="w-12 h-0.5 bg-gold-500 mx-auto mt-1 mb-6"></div>
+                <h2 class="font-serif text-3xl md:text-4xl text-maroon-800 mb-8">Priya &amp; Aarav</h2>
+
+                <div class="relative max-w-md mx-auto p-3 bg-white rounded-2xl shadow-xl gold-border">
+                    <div class="overflow-hidden rounded-xl aspect-[4/5] bg-maroon-900">
+                        <img 
+                            src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1000&q=80" 
+                            alt="Priya and Aarav Wedding Couple" 
+                            class="w-full h-full object-cover filter saturate-110"
+                            onerror="this.src='https://placehold.co/600x750/7A1C2E/E6C567?text=Priya+%26+Aarav'"
+                        >
+                    </div>
+                </div>
+                <p class="font-serif italic text-maroon-800 mt-6 text-lg">"Two souls with but a single thought, two hearts that beat as one."</p>
+            </section>
+
+            <!-- PAGE 3: CEREMONIAL SCHEDULE & VENUE -->
+            <section id="page-3" class="notebook-page ornate-card p-8 md:p-16 rounded-3xl gold-border my-6">
+                <div class="text-center mb-10">
+                    <span class="text-gold-600 font-serif text-sm tracking-widest uppercase">Ceremonial Schedule</span>
+                    <div class="w-12 h-0.5 bg-gold-500 mx-auto mt-1 mb-3"></div>
+                    <h2 class="font-serif text-3xl md:text-4xl text-maroon-800">Wedding Celebrations</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <!-- Haldi -->
+                    <div class="bg-white p-6 rounded-2xl border border-gold-500/30 text-center shadow-sm">
+                        <span class="text-xs font-semibold text-gold-600 uppercase tracking-widest">Day 01</span>
+                        <h3 class="font-serif text-xl text-maroon-800 font-bold mt-1 mb-2">HALDI</h3>
+                        <p class="text-gold-600 font-serif font-semibold mb-3">13 Feb 2027 • 11:00 AM</p>
+                        <p class="text-maroon-900/80 text-xs leading-relaxed">Vibrant morning ritual with turmeric, flower petals, and familial blessings.</p>
+                    </div>
+                    <!-- Mehendi -->
+                    <div class="bg-white p-6 rounded-2xl border border-gold-500/30 text-center shadow-sm">
+                        <span class="text-xs font-semibold text-gold-600 uppercase tracking-widest">Day 02</span>
+                        <h3 class="font-serif text-xl text-maroon-800 font-bold mt-1 mb-2">MEHENDI &amp; SANGEET</h3>
+                        <p class="text-gold-600 font-serif font-semibold mb-3">14 Feb 2027 • 6:00 PM</p>
+                        <p class="text-maroon-900/80 text-xs leading-relaxed">Intricate henna designs, musical melodies, and dazzling dance performances.</p>
+                    </div>
+                    <!-- Wedding -->
+                    <div class="bg-white p-6 rounded-2xl border border-gold-500/30 text-center shadow-sm">
+                        <span class="text-xs font-semibold text-gold-600 uppercase tracking-widest">Day 03</span>
+                        <h3 class="font-serif text-xl text-maroon-800 font-bold mt-1 mb-2">WEDDING</h3>
+                        <p class="text-gold-600 font-serif font-semibold mb-3">15 Feb 2027 • 7:00 PM</p>
+                        <p class="text-maroon-900/80 text-xs leading-relaxed">Sacred pheras and traditional vows uniting two families for a lifetime.</p>
+                    </div>
+                </div>
+
+                <!-- Venue Card -->
+                <div class="bg-maroon-900 text-ivory p-6 rounded-2xl gold-border text-center">
+                    <h3 class="font-serif text-2xl text-gold-400 mb-2">The Royal Palace Gardens</h3>
+                    <p class="text-ivory/80 text-sm mb-4 font-serif">Amber Road, Jaipur, Rajasthan 302001, India</p>
+                    <a href="https://maps.google.com/?q=The+Royal+Palace+Gardens+Jaipur" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-gold-500 text-maroon-900 font-semibold px-6 py-2.5 rounded-full shadow hover:bg-gold-400 transition text-sm">
+                        Get Directions
+                    </a>
+                </div>
+            </section>
+
+            <!-- PAGE 4: PHOTO GALLERY & COUNTDOWN -->
+            <section id="page-4" class="notebook-page ornate-card p-8 md:p-16 rounded-3xl gold-border my-6">
+                <div class="text-center mb-10">
+                    <span class="text-gold-600 font-serif text-sm tracking-widest uppercase">Moments in Time</span>
+                    <div class="w-12 h-0.5 bg-gold-500 mx-auto mt-1 mb-3"></div>
+                    <h2 class="font-serif text-3xl md:text-4xl text-maroon-800">Photo Gallery</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                    <div class="overflow-hidden rounded-xl shadow cursor-pointer group relative aspect-[4/3] bg-maroon-900" onclick="openLightbox(this)">
+                        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="Gallery 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='https://placehold.co/600x450/7A1C2E/E6C567?text=Photo+1'">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow cursor-pointer group relative aspect-[4/3] bg-maroon-900" onclick="openLightbox(this)">
+                        <img src="https://images.unsplash.com/photo-1545232979-fbf6e4c76129?auto=format&fit=crop&w=800&q=80" alt="Gallery 2" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='https://placehold.co/600x450/7A1C2E/E6C567?text=Photo+2'">
+                    </div>
+                    <div class="overflow-hidden rounded-xl shadow cursor-pointer group relative aspect-[4/3] bg-maroon-900" onclick="openLightbox(this)">
+                        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80" alt="Gallery 3" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" onerror="this.src='https://placehold.co/600x450/7A1C2E/E6C567?text=Photo+3'">
+                    </div>
+                </div>
+
+                <!-- Countdown Timer inside Page 4 -->
+                <div class="bg-maroon-800 text-ivory p-6 rounded-2xl text-center">
+                    <h4 class="font-serif text-gold-400 text-xl mb-4">Countdown to Eternity</h4>
+                    <div class="grid grid-cols-4 gap-2 max-w-md mx-auto">
+                        <div class="bg-maroon-900 p-2 rounded border border-gold-500/30">
+                            <span id="days" class="block font-serif text-2xl text-gold-400 font-bold">00</span>
+                            <span class="text-[10px] uppercase tracking-widest text-ivory/70">Days</span>
+                        </div>
+                        <div class="bg-maroon-900 p-2 rounded border border-gold-500/30">
+                            <span id="hours" class="block font-serif text-2xl text-gold-400 font-bold">00</span>
+                            <span class="text-[10px] uppercase tracking-widest text-ivory/70">Hours</span>
+                        </div>
+                        <div class="bg-maroon-900 p-2 rounded border border-gold-500/30">
+                            <span id="minutes" class="block font-serif text-2xl text-gold-400 font-bold">00</span>
+                            <span class="text-[10px] uppercase tracking-widest text-ivory/70">Minutes</span>
+                        </div>
+                        <div class="bg-maroon-900 p-2 rounded border border-gold-500/30">
+                            <span id="seconds" class="block font-serif text-2xl text-gold-400 font-bold">00</span>
+                            <span class="text-[10px] uppercase tracking-widest text-ivory/70">Seconds</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 5: CLOSING BLESSINGS -->
+            <section id="page-5" class="notebook-page ornate-card p-8 md:p-16 rounded-3xl gold-border text-center my-6">
+                <div class="text-gold-400 text-2xl font-serif mb-4">॥ शुभं भवतु ॥</div>
+                <h2 class="font-serif text-3xl md:text-4xl text-maroon-800 mb-4">Two Hearts. One Beautiful Beginning.</h2>
+                <p class="font-serif italic text-lg text-maroon-900/80 mb-8">
+                    "Aapki upasthiti aur aashirwad hamare liye anmol hain."
+                </p>
+                <div class="w-16 h-0.5 bg-gold-500 mx-auto mb-8"></div>
+                <h3 class="font-script text-5xl md:text-6xl text-gold-400 mb-4">
+                    Aarav &hearts; Priya
+                </h3>
+                <p class="text-xs uppercase tracking-widest text-maroon-900/60 mt-6">&copy; 2027 Priya &amp; Aarav Wedding Invitation.</p>
+            </section>
+
+            <!-- KINDLE NOTEBOOK NAVIGATION CONTROLS -->
+            <div class="flex items-center justify-between mt-8 px-4">
+                <button id="prev-btn" onclick="changePage(-1)" class="opacity-50 cursor-not-allowed bg-maroon-800 text-gold-400 px-6 py-3 rounded-full font-serif text-sm border border-gold-500/40 hover:bg-maroon-700 transition" disabled>
+                    &larr; Previous Page
+                </button>
+                <button id="next-btn" onclick="changePage(1)" class="bg-maroon-800 text-gold-400 px-8 py-3 rounded-full font-serif text-sm border border-gold-500/40 hover:bg-maroon-700 transition shadow-lg">
+                    Next Page &rarr;
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- FULL-SCREEN LIGHTBOX -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4" onclick="closeLightbox(event)">
+        <button onclick="closeLightbox(event)" class="absolute top-6 right-6 text-gold-400 hover:text-white text-4xl font-serif focus:outline-none z-50 p-2">&times;</button>
+        <div class="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-lg gold-border">
+            <img id="lightbox-img" src="" alt="Enlarged photo preview" class="max-w-full max-h-[85vh] object-contain mx-auto block">
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. Generate Floating Petals Animation
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('petals-container');
+            const petalCount = 18;
+            for (let i = 0; i < petalCount; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                petal.style.left = `${Math.random() * 100}vw`;
+                petal.style.width = `${Math.floor(Math.random() * 10) + 12}px`;
+                petal.style.height = `${Math.floor(Math.random() * 15) + 18}px`;
+                petal.style.animationDuration = `${Math.random() * 8 + 6}s`;
+                petal.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(petal);
+            }
+        });
+
+        // 2. Open Physical Card / Envelope with Confetti & Flowers Pop
+        function openWeddingCard() {
+            const cover = document.getElementById('invite-cover-screen');
+            cover.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                cover.style.display = 'none';
+            }, 1000);
+
+            const main = document.getElementById('main-content');
+            main.classList.remove('opacity-0', 'pointer-events-none');
+
+            // Trigger Celebration Confetti Effect
+            triggerConfetti();
+        }
+
+        // Simple Confetti & Flower Burst Simulation using DOM elements
+        function triggerConfetti() {
+            const colors = ['#D4AF37', '#7A1C2E', '#F7D7DE', '#E6C567', '#FAF7F2'];
+            for (let i = 0; i < 45; i++) {
+                const conf = document.createElement('div');
+                conf.style.position = 'fixed';
+                conf.style.top = '50%';
+                conf.style.left = '50%';
+                conf.style.width = `${Math.floor(Math.random() * 10) + 6}px`;
+                conf.style.height = `${Math.floor(Math.random() * 10) + 6}px`;
+                conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                conf.style.zIndex = '60';
+                conf.style.pointerEvents = 'none';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 300 + 100;
+                const targetX = Math.cos(angle) * distance;
+                const targetY = Math.sin(angle) * distance;
+
+                conf.style.transition = 'transform 1.2s cubic-bezier(0.1, 1, 0.3, 1), opacity 1.2s ease';
+                document.body.appendChild(conf);
+
+                requestAnimationFrame(() => {
+                    conf.style.transform = `translate(${targetX}px, ${targetY}px) rotate(${Math.random() * 360}deg)`;
+                    conf.style.opacity = '0';
+                });
+
+                setTimeout(() => conf.remove(), 1200);
+            }
+        }
+
+        // 3. Kindle Notebook Page Navigation
+        let currentPage = 1;
+        const totalPages = 5;
+
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage < 1 || newPage > totalPages) return;
+
+            // Hide current page
+            document.getElementById(`page-${currentPage}`).classList.remove('active');
+            
+            // Show new page
+            currentPage = newPage;
+            document.getElementById(`page-${currentPage}`).classList.add('active');
+
+            // Update Page Indicator
+            document.getElementById('page-indicator').innerText = `Chapter ${currentPage} of ${totalPages}`;
+
+            // Update Buttons State
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (currentPage === 1) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            if (currentPage === totalPages) {
+                nextBtn.disabled = true;
+                nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 4. Wedding Countdown Timer
+        const weddingDate = new Date('February 15, 2027 19:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+
+            if (distance < 0) return;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+
+            if (daysEl) daysEl.innerText = String(days).padStart(2, '0');
+            if (hoursEl) hoursEl.innerText = String(hours).padStart(2, '0');
+            if (minutesEl) minutesEl.innerText = String(minutes).padStart(2, '0');
+            if (secondsEl) secondsEl.innerText = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 5. Music Player Handler
+        let isPlaying = false;
+        const audio = document.getElementById('bg-audio');
+        const musicText = document.getElementById('music-text');
+        const musicIcon = document.getElementById('music-icon');
+
+        function toggleMusic() {
+            if (!isPlaying) {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    musicText.innerText = 'Pause Sangeet';
+                    musicIcon.classList.add('animate-spin');
+                }).catch(() => {
+                    musicText.innerText = 'Sangeet Active';
+                    isPlaying = true;
+                });
+            } else {
+                audio.pause();
+                isPlaying = false;
+                musicText.innerText = 'Play Sangeet';
+                musicIcon.classList.remove('animate-spin');
+            }
+        }
+
+        // 6. Lightbox Functions
+        function openLightbox(element) {
+            const img = element.querySelector('img');
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            
+            lightboxImg.src = img.src;
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(event) {
+            if (event.target.id === 'lightbox' || event.target.tagName === 'BUTTON' || event.target.closest('button')) {
+                const lightbox = document.getElementById('lightbox');
+                lightbox.classList.add('hidden');
+                lightbox.classList.remove('flex');
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+</body>
+</html>
